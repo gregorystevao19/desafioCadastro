@@ -1,4 +1,6 @@
-import java.io.File;
+package domain;
+
+import java.io.*;
 import java.util.Scanner;
 
 public class Menu {
@@ -10,7 +12,7 @@ public class Menu {
     private String fileFormularioPerguntas = "formulario.txt";
     private File file = new File(directoryFormularioPerguntas, fileFormularioPerguntas);
 
-    public void printMenu(){
+    public void printMenu() {
         System.out.println("----------------- SISTEMA DE PETS -----------------");
         System.out.println("[1] - Cadastrar um novo pet");
         System.out.println("[2] - Alterar os dados do pet cadastrado");
@@ -21,17 +23,17 @@ public class Menu {
         System.out.println("---------------------------------------------------");
     }
 
-    public void handleMenuInput(){
+    public void handleMenuInput() {
 
         System.out.print("Informe qual opção será executada: ");
         userInput = sc.next();
         int numericUserInput;
 
-        while (true){
-            try{
+        while (true) {
+            try {
                 numericUserInput = Integer.parseInt(userInput.trim());
-                if(numericUserInput < 0 || numericUserInput > 6) throw new IllegalArgumentException();
-                switch (numericUserInput){
+                if (numericUserInput < 0 || numericUserInput > 6) throw new IllegalArgumentException();
+                switch (numericUserInput) {
                     case 1 -> cadastrarPet();
                     case 6 -> System.out.println("Finalizando ...");
                 }
@@ -39,14 +41,18 @@ public class Menu {
             } catch (NumberFormatException e) {
                 System.out.print("Valor inválido, informe novamente: ");
                 userInput = sc.next();
-            }catch (IllegalArgumentException e){
+            } catch (IllegalArgumentException e) {
                 System.out.print("Opção inexistente, informe novamente: ");
                 userInput = sc.next();
             }
         }
     }
 
-    private void cadastrarPet(){
-
+    private void cadastrarPet() {
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
