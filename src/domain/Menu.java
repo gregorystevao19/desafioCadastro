@@ -1,13 +1,8 @@
-import domain.Endereco;
-import domain.Pet;
-import domain.SexoPet;
-import domain.TipoPet;
+package domain;
 
 import java.io.*;
-import java.net.UnknownServiceException;
 import java.time.LocalDateTime;
 import java.util.Scanner;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Menu {
