@@ -4,10 +4,20 @@ public class Pet {
     private String nome;
     private TipoPet tipo;
     private SexoPet sexoPet;
-    private Endereco endereço;
+    private Endereco endereco;
     private String idade;
     private String peso;
     private String raca;
+
+    public Pet(String nome, TipoPet tipo, SexoPet sexoPet, Endereco endereco, String idade, String peso, String raca) {
+        this.nome = nome;
+        this.tipo = tipo;
+        this.sexoPet = sexoPet;
+        this.endereco = endereco;
+        this.idade = idade;
+        this.peso = peso;
+        this.raca = raca;
+    }
 
     public String getNome() {
         return nome;
@@ -22,7 +32,7 @@ public class Pet {
     }
 
     public Endereco getEndereço() {
-        return endereço;
+        return endereco;
     }
 
     public String getIdade() {
@@ -35,15 +45,5 @@ public class Pet {
 
     public String getRaca() {
         return raca;
-    }
-
-    public Pet(String nome, TipoPet tipo, SexoPet sexoPet, Endereco endereço, String idade, String peso, String raca) {
-        this.nome = nome;
-        this.tipo = tipo;
-        this.sexoPet = sexoPet;
-        this.endereço = endereço;
-        this.idade = idade;
-        this.peso = peso;
-        this.raca = raca;
     }
 }

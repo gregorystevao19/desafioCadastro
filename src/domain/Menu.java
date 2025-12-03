@@ -1,6 +1,7 @@
 package domain;
 
 import java.io.*;
+import java.sql.Array;
 import java.time.LocalDateTime;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -38,6 +39,7 @@ public class Menu {
                 if (numericUserInput < 0 || numericUserInput > 6) throw new IllegalArgumentException();
                 switch (numericUserInput) {
                     case 1 -> cadastrarPet();
+                    case 5 -> listarPetsPorCriterio();
                     case 6 -> System.out.println("Finalizando ...");
                 }
                 return;
@@ -48,6 +50,177 @@ public class Menu {
                 System.out.print("Opção inexistente, informe novamente: ");
                 userInput = sc.nextLine();
             }
+        }
+    }
+
+    public String lerNomePet(String NAO_INFORMADO) {
+        String userInput = sc.nextLine();
+
+        if (userInput.trim().isEmpty() || userInput == null) {
+            userInput = NAO_INFORMADO;
+            return userInput;
+        }
+
+        while (userInput.trim().split(" ").length != 2 || Pattern.compile("[^A-Za-z ]").matcher(userInput).find()) {
+            System.out.print("Deve ser informado NOME e SOBRENOME válidos (Caracteres [A - Z]): Digite novamente: ");
+            userInput = sc.nextLine();
+        }
+        return userInput;
+    }
+
+    public TipoPet lerTipoPet() {
+        System.out.println("[1] - GATO");
+        System.out.println("[2] - CACHORRO");
+        int userInput = sc.nextInt();
+
+        while ((userInput != 1) && (userInput != 2)) {
+            System.out.print("Opção inválida, escolha novamente: ");
+            userInput = sc.nextInt();
+        }
+
+        sc.nextLine();
+        return userInput == 1 ? TipoPet.GATO : TipoPet.CACHORRO;
+    }
+
+    public SexoPet lerSexoPet() {
+
+        System.out.println("[1] - MACHO");
+        System.out.println("[2] - FEMEA");
+        int userInput = sc.nextInt();
+
+        while ((userInput != 1) && (userInput != 2)) {
+            System.out.print("Opção inválida, escolha novamente: ");
+            userInput = sc.nextInt();
+        }
+
+        sc.nextLine();
+        return userInput == 1 ? SexoPet.MACHO : SexoPet.FEMEA;
+    }
+
+    public Endereco lerEnderecoPet(String NAO_INFORMADO) {
+        String cidade = "";
+        String rua = "";
+        String numeroCasa = "";
+        int index = 1;
+
+        while (index <= 3) {
+            switch (index) {
+                case 1: {
+                    System.out.print("Informe a cidade: ");
+                    cidade = sc.nextLine();
+                    while (cidade.isEmpty()) {
+                        System.out.print("Informe uma Cidade válida: ");
+                        cidade = sc.nextLine();
+                    }
+                    break;
+                }
+                case 2: {
+                    System.out.print("Informe a rua: ");
+                    rua = sc.nextLine();
+                    while (rua.isEmpty()) {
+                        System.out.print("Informe uma Rua válida: ");
+                        rua = sc.nextLine();
+                    }
+                    break;
+                }
+                case 3: {
+                    System.out.print("Informe o número da casa: ");
+                    while (true) {
+                        String userInput = sc.nextLine();
+                        if (userInput.trim().isEmpty()) {
+                            numeroCasa = NAO_INFORMADO;
+                            break;
+                        }
+                        try {
+                            Integer.parseInt(userInput);
+                            numeroCasa = userInput;
+                            break;
+                        } catch (NumberFormatException e) {
+                            System.out.print("Número Inválido. Informe novamente: ");
+                        }
+                    }
+                }
+            }
+            index++;
+        }
+        return new Endereco(cidade, rua, numeroCasa);
+    }
+
+    public String lerIdadePet(String NAO_INFORMADO) {
+        while (true) {
+            String userInput = sc.nextLine();
+
+            if (userInput.trim().isEmpty()) {
+                return NAO_INFORMADO;
+            }
+
+            String formatedUserInput = userInput.replaceAll(",", ".");
+            try {
+                double numericInput = Double.parseDouble(formatedUserInput);
+                if (numericInput <= 0 || numericInput > 20) {
+                    throw new IllegalArgumentException();
+                }
+                return formatedUserInput;
+            } catch (NumberFormatException e) {
+                System.out.print("Informe um número válido: ");
+            } catch (IllegalArgumentException e) {
+                System.out.print("Informe uma idade MAIOR que 0 e MENOR que 20 anos: ");
+            }
+        }
+    }
+
+    public String lerPesoPet(String NAO_INFORMADO) {
+        while (true) {
+            String userInput = sc.nextLine();
+
+            if (userInput.trim().isEmpty()) {
+                return NAO_INFORMADO;
+            }
+
+            String formatedUserInput = userInput.replaceAll(",", ".");
+            try {
+                double numericInput = Double.parseDouble(formatedUserInput);
+                if (numericInput <= 0 || numericInput > 20) {
+                    throw new IllegalArgumentException();
+                }
+                return formatedUserInput;
+            } catch (NumberFormatException e) {
+                System.out.print("Informe um número válido: ");
+            } catch (IllegalArgumentException e) {
+                System.out.print("Informe uma idade MAIOR que 0 e MENOR que 20: ");
+            }
+        }
+    }
+
+    public String lerRacaPet(String NAO_INFORMADO) {
+        String userInput = sc.nextLine();
+
+        if (userInput.trim().isEmpty()) {
+            return NAO_INFORMADO;
+        }
+
+        while (Pattern.compile("[^A-Za-z ]").matcher(userInput).find()) {
+            System.out.print("Somente caracteres (A-Z) são aceitos. Informe a raça novamente: ");
+            userInput = sc.nextLine();
+            break;
+        }
+        return userInput;
+    }
+
+    public void salvarArquivoPet(Pet pet, String nomePet) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("src/Database/" + now + "-" + nomePet.trim().toUpperCase() + ".txt"))) {
+
+            bw.write("NOME: " + pet.getNome() + "\n");
+            bw.write("TIPO: " + pet.getTipo() + "\n");
+            bw.write("SEXO: " + pet.getSexoPet() + "\n");
+            bw.write("ENDEREÇO: " + pet.getEndereço().getRua() + ", " + pet.getEndereço().getNumeroCasa() + ", " + pet.getEndereço().getCidade() + "\n");
+            bw.write("IDADE: " + pet.getIdade() + "\n");
+            bw.write("PESO: " + pet.getPeso() + "\n");
+            bw.write("RAÇA: " + pet.getRaca());
+
+            System.out.println("Pet cadastrado com sucesso!");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -62,7 +235,7 @@ public class Menu {
             String nome = "";
             TipoPet tipo = null;
             SexoPet sexoPet = null;
-            Endereco endereço = null;
+            Endereco endereco = null;
             String idade = "";
             String peso = "";
             String raca = "";
@@ -71,194 +244,45 @@ public class Menu {
                 System.out.println(line);
                 switch (indexPergunta) {
                     case 1: {
-                        nome = sc.nextLine();
-
-                        if (nome.trim().isEmpty()) {
-                            nome = NAO_INFORMADO;
-                            break;
-                        }
-
-                        while (nome == null || nome.trim().split(" ").length != 2 || Pattern.compile("[^A-Za-z ]").matcher(nome).find()) {
-                            System.out.print("Deve ser informado NOME e SOBRENOME válidos (Caracteres [A - Z]): Digite novamente: ");
-                            nome = sc.nextLine();
-                        }
+                        nome = lerNomePet(NAO_INFORMADO);
                         break;
                     }
                     case 2: {
-                        System.out.println("[1] - GATO");
-                        System.out.println("[2] - CACHORRO");
-                        int userInput = sc.nextInt();
-
-                        while (!(userInput == 1) && !(userInput == 2)) {
-                            System.out.print("Opção inválida, escolha novamente: ");
-                            userInput = sc.nextInt();
-                        }
-
-                        sc.nextLine();
-                        switch (userInput) {
-                            case 1 -> tipo = TipoPet.GATO;
-                            case 2 -> tipo = TipoPet.CACHORRO;
-                        }
+                        tipo = lerTipoPet();
                         break;
                     }
                     case 3: {
-                        System.out.println("[1] - MACHO");
-                        System.out.println("[2] - FEMEA");
-                        int userInput = sc.nextInt();
-
-                        while (!(userInput == 1) && !(userInput == 2)) {
-                            System.out.print("Opção inválida, escolha novamente: ");
-                            userInput = sc.nextInt();
-                        }
-
-                        sc.nextLine();
-                        switch (userInput) {
-                            case 1 -> sexoPet = SexoPet.MACHO;
-                            case 2 -> sexoPet = SexoPet.FEMEA;
-                        }
+                        sexoPet = lerSexoPet();
                         break;
                     }
                     case 4: {
-                        String cidade = "";
-                        String rua = "";
-                        String numeroCasa = "";
-                        int index = 1;
-
-                        while (index <= 3) {
-                            switch (index) {
-                                case 1: {
-                                    System.out.print("Informe a cidade: ");
-                                    cidade = sc.nextLine();
-                                    while (cidade.isEmpty()) {
-                                        System.out.print("Informe uma Cidade válida: ");
-                                        cidade = sc.nextLine();
-                                    }
-                                    break;
-                                }
-                                case 2: {
-                                    System.out.print("Informe a rua: ");
-                                    rua = sc.nextLine();
-                                    while (rua.isEmpty()) {
-                                        System.out.print("Informe uma Rua válida: ");
-                                        rua = sc.nextLine();
-                                    }
-                                    break;
-                                }
-                                case 3: {
-                                    System.out.print("Informe o número da casa: ");
-                                    while (true) {
-                                        String userInput = sc.nextLine();
-                                        if (userInput.trim().isEmpty()) {
-                                            numeroCasa = NAO_INFORMADO;
-                                            break;
-                                        }
-                                        try {
-                                            Integer.parseInt(userInput);
-                                            numeroCasa = userInput;
-                                            break;
-                                        } catch (NumberFormatException e) {
-                                            System.out.print("Número Inválido. Informe novamente: ");
-                                        }
-                                    }
-                                }
-                            }
-                            index++;
-                        }
-                        endereço = new Endereco(cidade, rua, numeroCasa);
+                        endereco = lerEnderecoPet(NAO_INFORMADO);
                         break;
                     }
                     case 5: {
-                        while (true) {
-                            String userInput = sc.nextLine();
-
-                            if (userInput.trim().isEmpty()) {
-                                idade = NAO_INFORMADO;
-                                break;
-                            }
-
-                            String formatedUserInput = userInput.replaceAll(",", ".");
-                            try {
-                                double numericInput = Double.parseDouble(formatedUserInput);
-                                if (numericInput <= 0 || numericInput > 20) {
-                                    throw new IllegalArgumentException();
-                                }
-                                idade = formatedUserInput;
-                                break;
-                            } catch (NumberFormatException e) {
-                                System.out.print("Informe um número válido: ");
-                            } catch (IllegalArgumentException e) {
-                                System.out.print("Informe uma idade MAIOR que 0 e MENOR que 20: ");
-                            }
-                        }
+                        idade = lerIdadePet(NAO_INFORMADO);
                         break;
                     }
                     case 6: {
-                        while (true) {
-                            String userInput = sc.nextLine();
-
-                            if (userInput.trim().isEmpty()) {
-                                peso = NAO_INFORMADO;
-                                break;
-                            }
-
-                            String formatedUserInput = userInput.replaceAll(",", ".");
-                            try {
-                                double numericInput = Double.parseDouble(formatedUserInput);
-                                if (numericInput < 0.5 || numericInput > 20) {
-                                    throw new IllegalArgumentException();
-                                }
-                                peso = formatedUserInput;
-                                break;
-                            } catch (NumberFormatException e) {
-                                System.out.print("Informe um número válido: ");
-                            } catch (IllegalArgumentException e) {
-                                System.out.print("Informe umm peso MAIOR que 0.5Kg e MENOR que 60Kg: ");
-                            }
-                        }
+                        peso = lerPesoPet(NAO_INFORMADO);
                         break;
                     }
                     case 7: {
-                        String userInput = sc.nextLine();
-
-                        if (userInput.trim().isEmpty()) {
-                            raca = NAO_INFORMADO;
-                            break;
-                        }
-
-
-                        while (Pattern.compile("[^A-Za-z ]").matcher(nome).find()) {
-                            System.out.print("Somente caracteres (A-Z) são aceitos. Informe a raça novamente: ");
-                            userInput = sc.nextLine();
-                            break;
-                        }
-                        raca = userInput;
-                        break;
-                    }
-                    default: {
+                        raca = lerRacaPet(NAO_INFORMADO);
                         break;
                     }
                 }
                 indexPergunta++;
             }
+            Pet pet = new Pet(nome, tipo, sexoPet, endereco, idade, peso, raca);
+            salvarArquivoPet(pet, nome);
 
-            Pet pet = new Pet(nome, tipo, sexoPet, endereço, idade, peso, raca);
-
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter("src/Database/" + now + "-" + nome.trim().toUpperCase() + ".txt"))) {
-
-                bw.write("NOME: " + pet.getNome() + "\n");
-                bw.write("TIPO: " + pet.getTipo() + "\n");
-                bw.write("SEXO: " + pet.getSexoPet() + "\n");
-                bw.write("ENDEREÇO: " + pet.getEndereço().getRua() + ", " + pet.getEndereço().getNumeroCasa() + ", " + pet.getEndereço().getCidade() + "\n");
-                bw.write("IDADE: " + pet.getIdade() + "\n");
-                bw.write("PESO: " + pet.getPeso() + "\n");
-                bw.write("RAÇA: " + pet.getRaca());
-
-                System.out.println("Pet cadastrado com sucesso!");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void listarPetsPorCriterio() {
+
     }
 }
