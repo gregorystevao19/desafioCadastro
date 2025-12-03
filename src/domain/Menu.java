@@ -3,6 +3,7 @@ package domain;
 import java.io.*;
 import java.sql.Array;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -31,9 +32,9 @@ public class Menu {
 
         System.out.print("Informe qual opção será executada: ");
         userInput = sc.nextLine();
-        int numericUserInput;
 
         while (true) {
+            int numericUserInput;
             try {
                 numericUserInput = Integer.parseInt(userInput.trim());
                 if (numericUserInput < 0 || numericUserInput > 6) throw new IllegalArgumentException();
@@ -213,7 +214,7 @@ public class Menu {
             bw.write("NOME: " + pet.getNome() + "\n");
             bw.write("TIPO: " + pet.getTipo() + "\n");
             bw.write("SEXO: " + pet.getSexoPet() + "\n");
-            bw.write("ENDEREÇO: " + pet.getEndereço().getRua() + ", " + pet.getEndereço().getNumeroCasa() + ", " + pet.getEndereço().getCidade() + "\n");
+            bw.write("ENDEREÇO:" + pet.getEndereço().getRua() + ", " + pet.getEndereço().getNumeroCasa() + ", " + pet.getEndereço().getCidade() + "\n");
             bw.write("IDADE: " + pet.getIdade() + "\n");
             bw.write("PESO: " + pet.getPeso() + "\n");
             bw.write("RAÇA: " + pet.getRaca());
@@ -284,5 +285,108 @@ public class Menu {
 
     private void listarPetsPorCriterio() {
 
+        int[] criteriosFiltro = new int[2];
+        int index = 0;
+        String userInput = null;
+
+        File pasta = new File("src/Database");
+        File[] arquivos = pasta.listFiles();
+        File[] filtredArquivos = {};
+
+        System.out.println("---------------------------------------------------");
+        System.out.println("Informe até DOIS critérios da busca");
+        System.out.println("[1] - Nome/Sobrenome");
+        System.out.println("[2] - Sexo");
+        System.out.println("[3] - Idade");
+        System.out.println("[4] - Peso");
+        System.out.println("[5] - Raça");
+        System.out.println("[6] - Endereço");
+        System.out.println("[7] - Sair");
+        System.out.println("---------------------------------------------------");
+
+        while (true) {
+            System.out.print("Opção: ");
+            userInput = sc.nextLine();
+            try {
+                int numericUserInput = Integer.parseInt(userInput);
+
+                if (numericUserInput < 1 || numericUserInput > 7) {
+                    throw new IllegalArgumentException();
+                }
+
+                criteriosFiltro[index] = numericUserInput;
+                index++;
+
+                if (numericUserInput == 7 || criteriosFiltro[1] != 0) {
+                    break;
+                }
+            } catch (NumberFormatException e) {
+                System.out.print("Informe um critério válido: ");
+            } catch (IllegalArgumentException e) {
+                System.out.print("Opção inválida. Selecione novalemnte: ");
+            }
+        }
+
+        for (int k : criteriosFiltro) {
+
+            switch (k) {
+                case 1 -> System.out.print("Critério 1 escolhido [Nome/Sobrenome]. Informe valor do filtro: ");
+                case 2 -> System.out.print("Critério 2 escolhido [Sexo]. Informe valor do filtro: ");
+                case 3 -> System.out.print("Critério 3 escolhido [Idade]. Informe valor do filtro: ");
+                case 4 -> System.out.print("Critério 4 escolhido [peso]. Informe valor do filtro: ");
+                case 5 -> System.out.print("Critério 5 escolhido [Raça]. Informe valor do filtro: ");
+                case 6 -> System.out.print("Critério 6 escolhido [Endereço]. Informe valor do filtro: ");
+            }
+
+            String valorFiltro = sc.nextLine();
+
+            if (pasta.exists() && pasta.isDirectory()) {
+                if (arquivos != null) {
+                    for (File arquivo : arquivos) {
+                        if (arquivo.isFile()) {
+                            boolean contains = false;
+                            try (BufferedReader br = new BufferedReader(new FileReader(arquivo))) {
+                                String line;
+                                while ((line = br.readLine()) != null) {
+                                    if (line.toLowerCase().contains(valorFiltro.toLowerCase())) {
+                                        contains = true;
+                                    }
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (contains) {
+                                File[] novoArray = Arrays.copyOf(filtredArquivos, filtredArquivos.length + 1);
+                                novoArray[novoArray.length - 1] = arquivo;
+                                filtredArquivos = novoArray;
+                            }
+                        }
+                    }
+                } else {
+                    throw new RuntimeException("Não há Pets cadastrados.");
+                }
+            } else {
+                throw new RuntimeException("Diretório inválido.");
+            }
+        }
+
+        int indexListagem = 1;
+        System.out.println("------------------------ RESULTADOS ------------------------");
+        for (File arquivoFiltrado : filtredArquivos) {
+            if (arquivoFiltrado.isFile()) {
+                try (BufferedReader br = new BufferedReader(new FileReader(arquivoFiltrado))) {
+                    String line;
+                    System.out.print(indexListagem + " - ");
+                    while ((line = br.readLine()) != null) {
+                        System.out.print(line + " - ");
+                    }
+                    System.out.println("\n");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        System.out.println("------------------------------------------------------------");
     }
 }
