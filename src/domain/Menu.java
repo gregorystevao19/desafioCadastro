@@ -356,7 +356,20 @@ public class Menu {
                                 e.printStackTrace();
                             }
 
-                            if (contains) {
+                            boolean alredyIncludedInFiltredArquvos = false;
+                            try (BufferedReader br = new BufferedReader(new FileReader(arquivo))) {
+                                while (br.readLine() != null) {
+                                    for (File arquivoFiltrado : filtredArquivos) {
+                                        if (arquivoFiltrado.getName().equals(arquivo.getName())) {
+                                            alredyIncludedInFiltredArquvos = true;
+                                        }
+                                    }
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (contains && !alredyIncludedInFiltredArquvos) {
                                 File[] novoArray = Arrays.copyOf(filtredArquivos, filtredArquivos.length + 1);
                                 novoArray[novoArray.length - 1] = arquivo;
                                 filtredArquivos = novoArray;
@@ -382,6 +395,7 @@ public class Menu {
                         System.out.print(line + " - ");
                     }
                     System.out.println("\n");
+                    indexListagem++;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
