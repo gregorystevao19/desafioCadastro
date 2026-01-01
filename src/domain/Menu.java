@@ -40,6 +40,7 @@ public class Menu {
                 if (numericUserInput < 0 || numericUserInput > 6) throw new IllegalArgumentException();
                 switch (numericUserInput) {
                     case 1 -> cadastrarPet();
+                    case 2 -> atualizarDadosPet();
                     case 5 -> listarPetsPorCriterio();
                     case 6 -> System.out.println("Finalizando ...");
                 }
@@ -283,7 +284,7 @@ public class Menu {
         }
     }
 
-    private void listarPetsPorCriterio() {
+    private File[] listarPetsPorCriterio() {
 
         int[] criteriosFiltro = new int[3];
         criteriosFiltro[0] = 0;
@@ -324,7 +325,7 @@ public class Menu {
             } catch (NumberFormatException e) {
                 System.out.print("Informe um critério válido: ");
             } catch (IllegalArgumentException e) {
-                System.out.print("Opção inválida. Selecione novalemnte: ");
+                System.out.print("Opção inválida. Selecione novamente: ");
             }
         }
 
@@ -341,6 +342,10 @@ public class Menu {
             }
 
             String valorFiltro = sc.nextLine();
+
+            if (valorFiltro.isEmpty()) {
+                continue;
+            }
 
             if (pasta.exists() && pasta.isDirectory()) {
                 if (arquivos != null) {
@@ -404,5 +409,104 @@ public class Menu {
             }
         }
         System.out.println("------------------------------------------------------------");
+        return filtredArquivos;
+    }
+
+    private void atualizarDadosPet() {
+        File[] petsCadastrados = listarPetsPorCriterio();
+        File petSelecionado;
+
+        System.out.print("Informe o número da listagem referente ao Pet que deseja editar: ");
+
+        while (true) {
+            try {
+                String userInputPetParaEditar = sc.nextLine();
+                int numericUserInput = Integer.parseInt(userInputPetParaEditar);
+
+                if (numericUserInput < 1 || numericUserInput > petsCadastrados.length) {
+                    throw new IllegalArgumentException();
+                }
+
+                petSelecionado = petsCadastrados[numericUserInput - 1];
+                break;
+            } catch (NumberFormatException e) {
+                System.out.print("Informe um Pet válido: ");
+            } catch (IllegalArgumentException e) {
+                System.out.print("Opção inválida. Selecione novamente: ");
+            }
+        }
+
+        System.out.println("Qual informação do Pet deseja editar? ");
+        System.out.println("[1] - Nome/Sobrenome");
+        System.out.println("[2] - Endereço");
+        System.out.println("[3] - Idade");
+        System.out.println("[4] - Peso");
+        System.out.println("[5] - Raça");
+
+        String userInputAtributoParaEditar = sc.nextLine();
+
+        while (true) {
+            try {
+                int numericUserInput = Integer.parseInt(userInputAtributoParaEditar);
+
+                if (numericUserInput < 1 || numericUserInput > 5) {
+                    throw new IllegalArgumentException();
+                }
+
+                switch (numericUserInput) {
+                    case 1 -> numericUserInput = 0;
+                    case 2 -> numericUserInput = 3;
+                    case 3 -> numericUserInput = 4;
+                    case 4 -> numericUserInput = 5;
+                    case 5 -> numericUserInput = 6;
+                }
+
+                String novaLinha;
+                String[] linhasOriginais = new String[7];
+
+                try (BufferedReader br = new BufferedReader(new FileReader(petSelecionado))) {
+                    String line;
+                    int indexLine = 0;
+                    String novoAtributo;
+                    while ((line = br.readLine()) != null) {
+                        if (indexLine == numericUserInput) {
+                            System.out.println("Valor original: " + line);
+                            System.out.print("Novo valor: ");
+                            novoAtributo = sc.nextLine();
+                            novaLinha = line.replaceAll(
+                                    "^([^:]+: ).*$",
+                                    "$1" + novoAtributo
+                            );
+                            linhasOriginais[indexLine] = novaLinha;
+                            indexLine++;
+                            continue;
+                        }
+                        linhasOriginais[indexLine] = line;
+                        indexLine++;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                try (BufferedWriter bw = new BufferedWriter(new FileWriter(petSelecionado))) {
+                    for(int i = 0; i < linhasOriginais.length; i++){
+                        String conteudoLinha = linhasOriginais[i];
+                        if(i != 7){
+                            conteudoLinha += " \n";
+                        }
+                        bw.write(conteudoLinha);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println("Editado com sucesso!");
+                break;
+            } catch (NumberFormatException e) {
+                System.out.print("Informe um critério válido: ");
+            } catch (IllegalArgumentException e) {
+                System.out.print("Opção inválida. Selecione novamente: ");
+            }
+        }
     }
 }

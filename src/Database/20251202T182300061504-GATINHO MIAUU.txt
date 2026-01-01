@@ -1,7 +1,7 @@
-NOME: Gatinho Miauu primeiro
-TIPO: GATO
-SEXO: MACHO
-ENDEREÇO: Minha rua, 900, Minha cidade
-IDADE: NÃO INFORMADO
-PESO: NÃO INFORMADO
-RAÇA: NÃO INFORMADO
+NOME: teste  
+TIPO: GATO  
+SEXO: MACHO  
+ENDEREÇO: rua, 900, cidade  
+IDADE: 7 
+PESO: NÃO INFORMADO  
+RAÇA: NÃO INFORMADO  
