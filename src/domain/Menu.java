@@ -41,6 +41,7 @@ public class Menu {
                 switch (numericUserInput) {
                     case 1 -> cadastrarPet();
                     case 2 -> atualizarDadosPet();
+                    case 3 -> deletarPet();
                     case 5 -> listarPetsPorCriterio();
                     case 6 -> System.out.println("Finalizando ...");
                 }
@@ -507,6 +508,38 @@ public class Menu {
             } catch (IllegalArgumentException e) {
                 System.out.print("Opção inválida. Selecione novamente: ");
             }
+        }
+    }
+
+    private void deletarPet() {
+        File[] petsCadastrados = listarPetsPorCriterio();
+        File petSelecionado;
+
+        System.out.print("Informe o número da listagem referente ao Pet que deseja excluir: ");
+
+        while (true) {
+            try {
+                String userInputPetParaEditar = sc.nextLine();
+                int numericUserInput = Integer.parseInt(userInputPetParaEditar);
+
+                if (numericUserInput < 1 || numericUserInput > petsCadastrados.length) {
+                    throw new IllegalArgumentException();
+                }
+
+                petSelecionado = petsCadastrados[numericUserInput - 1];
+                break;
+            } catch (NumberFormatException e) {
+                System.out.print("Informe um Pet válido: ");
+            } catch (IllegalArgumentException e) {
+                System.out.print("Opção inválida. Selecione novamente: ");
+            }
+        }
+
+        System.out.print("Deseja confirmar a exclusão do Pet? [SIM/NÃO]? ");
+        String userInputConfirmacao = sc.nextLine();
+
+        if(userInputConfirmacao.toLowerCase().equals("sim") && petSelecionado.delete()){
+            System.out.println("Pet excluído com sucesso!");
         }
     }
 }
