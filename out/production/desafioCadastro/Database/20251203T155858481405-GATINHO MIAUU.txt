@@ -1,5 +1,5 @@
 NOME: gatinho miauu segundo
-TIPO: GATO
+TIPO: CACHORRO
 SEXO: MACHO
 ENDEREÇO: rua, 123, cidade
 IDADE: NÃO INFORMADO

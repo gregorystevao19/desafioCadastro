@@ -285,8 +285,9 @@ public class Menu {
 
     private void listarPetsPorCriterio() {
 
-        int[] criteriosFiltro = new int[2];
-        int index = 0;
+        int[] criteriosFiltro = new int[3];
+        criteriosFiltro[0] = 0;
+        int index = 1;
         String userInput = null;
 
         File pasta = new File("src/Database");
@@ -317,7 +318,7 @@ public class Menu {
                 criteriosFiltro[index] = numericUserInput;
                 index++;
 
-                if (numericUserInput == 7 || criteriosFiltro[1] != 0) {
+                if (numericUserInput == 7 || criteriosFiltro[2] != 0) {
                     break;
                 }
             } catch (NumberFormatException e) {
@@ -330,6 +331,7 @@ public class Menu {
         for (int k : criteriosFiltro) {
 
             switch (k) {
+                case 0 -> System.out.print("Critério Padrão [TIPO]. Informe: [GATO / CACHORRO]: ");
                 case 1 -> System.out.print("Critério 1 escolhido [Nome/Sobrenome]. Informe valor do filtro: ");
                 case 2 -> System.out.print("Critério 2 escolhido [Sexo]. Informe valor do filtro: ");
                 case 3 -> System.out.print("Critério 3 escolhido [Idade]. Informe valor do filtro: ");
