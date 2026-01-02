@@ -287,6 +287,9 @@ public class Menu {
 
     private File[] listarPetsPorCriterio() {
 
+        final String COMECO_NEGRITO = "\u001B[1m";
+        final String FIM_NEGRITO = "\u001B[0m";
+
         int[] criteriosFiltro = new int[8];
         criteriosFiltro[0] = 0;
         int index = 1;
@@ -330,6 +333,8 @@ public class Menu {
                 System.out.print("Opção inválida. Selecione novamente: ");
             }
         }
+
+        String[] parametrosEncontrados = new String[8];
 
         for (int k : criteriosFiltro) {
 
@@ -377,6 +382,7 @@ public class Menu {
                                     while ((line = br.readLine()) != null) {
                                         if (line.toLowerCase().contains(valorFiltro.toLowerCase())) {
                                             contains = true;
+                                            parametrosEncontrados[k] = line;
                                         }
                                     }
                                 }
@@ -428,6 +434,11 @@ public class Menu {
                     String line;
                     System.out.print(indexListagem + " - ");
                     while ((line = br.readLine()) != null) {
+                        for (String texto : parametrosEncontrados) {
+                            if (texto != null && texto.equals(line)) {
+                                System.out.print(COMECO_NEGRITO + line + FIM_NEGRITO + " - ");
+                            }
+                        }
                         System.out.print(line + " - ");
                     }
                     System.out.println("\n");
