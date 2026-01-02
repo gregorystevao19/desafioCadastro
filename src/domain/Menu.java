@@ -287,7 +287,7 @@ public class Menu {
 
     private File[] listarPetsPorCriterio() {
 
-        int[] criteriosFiltro = new int[3];
+        int[] criteriosFiltro = new int[8];
         criteriosFiltro[0] = 0;
         int index = 1;
         String userInput = null;
@@ -297,14 +297,15 @@ public class Menu {
         File[] filtredArquivos = {};
 
         System.out.println("---------------------------------------------------");
-        System.out.println("Informe até DOIS critérios da busca");
+        System.out.println("Informe quais critérios deseja usar na busca. Por padrão, sempre será exigido a busca por tipo");
         System.out.println("[1] - Nome/Sobrenome");
         System.out.println("[2] - Sexo");
         System.out.println("[3] - Idade");
         System.out.println("[4] - Peso");
         System.out.println("[5] - Raça");
         System.out.println("[6] - Endereço");
-        System.out.println("[7] - Sair");
+        System.out.println("[7] - Data de cadastro");
+        System.out.println("[8] - Sair");
         System.out.println("---------------------------------------------------");
 
         while (true) {
@@ -313,14 +314,14 @@ public class Menu {
             try {
                 int numericUserInput = Integer.parseInt(userInput);
 
-                if (numericUserInput < 1 || numericUserInput > 7) {
+                if (numericUserInput < 1 || numericUserInput > 8) {
                     throw new IllegalArgumentException();
                 }
 
                 criteriosFiltro[index] = numericUserInput;
                 index++;
 
-                if (numericUserInput == 7 || criteriosFiltro[2] != 0) {
+                if (numericUserInput == 8 || criteriosFiltro[7] != 0) {
                     break;
                 }
             } catch (NumberFormatException e) {
@@ -332,6 +333,8 @@ public class Menu {
 
         for (int k : criteriosFiltro) {
 
+            if (k == 8) break;
+
             switch (k) {
                 case 0 -> System.out.print("Critério Padrão [TIPO]. Informe: [GATO / CACHORRO]: ");
                 case 1 -> System.out.print("Critério 1 escolhido [Nome/Sobrenome]. Informe valor do filtro: ");
@@ -340,9 +343,22 @@ public class Menu {
                 case 4 -> System.out.print("Critério 4 escolhido [peso]. Informe valor do filtro: ");
                 case 5 -> System.out.print("Critério 5 escolhido [Raça]. Informe valor do filtro: ");
                 case 6 -> System.out.print("Critério 6 escolhido [Endereço]. Informe valor do filtro: ");
+                case 7 -> System.out.println("Critério 7 escolhido [Data cadastro].");
             }
 
-            String valorFiltro = sc.nextLine();
+            String mesFiltro;
+            String anoFiltro;
+            String valorFiltro = null;
+
+            if (k == 7) {
+                System.out.print("Mês [01 - 12]: ");
+                mesFiltro = sc.nextLine();
+                System.out.print("Ano: ");
+                anoFiltro = sc.nextLine();
+                valorFiltro = anoFiltro + mesFiltro;
+            } else {
+                valorFiltro = sc.nextLine();
+            }
 
             if (valorFiltro.isEmpty()) {
                 continue;
@@ -355,9 +371,13 @@ public class Menu {
                             boolean contains = false;
                             try (BufferedReader br = new BufferedReader(new FileReader(arquivo))) {
                                 String line;
-                                while ((line = br.readLine()) != null) {
-                                    if (line.toLowerCase().contains(valorFiltro.toLowerCase())) {
-                                        contains = true;
+                                if (k == 7 && arquivo.getName().contains(valorFiltro)) {
+                                    contains = true;
+                                } else {
+                                    while ((line = br.readLine()) != null) {
+                                        if (line.toLowerCase().contains(valorFiltro.toLowerCase())) {
+                                            contains = true;
+                                        }
                                     }
                                 }
                             } catch (IOException e) {
@@ -366,10 +386,18 @@ public class Menu {
 
                             boolean alredyIncludedInFiltredArquvos = false;
                             try (BufferedReader br = new BufferedReader(new FileReader(arquivo))) {
-                                while (br.readLine() != null) {
+                                if (k == 7) {
                                     for (File arquivoFiltrado : filtredArquivos) {
                                         if (arquivoFiltrado.getName().equals(arquivo.getName())) {
                                             alredyIncludedInFiltredArquvos = true;
+                                        }
+                                    }
+                                } else {
+                                    while (br.readLine() != null) {
+                                        for (File arquivoFiltrado : filtredArquivos) {
+                                            if (arquivoFiltrado.getName().equals(arquivo.getName())) {
+                                                alredyIncludedInFiltredArquvos = true;
+                                            }
                                         }
                                     }
                                 }
@@ -490,9 +518,9 @@ public class Menu {
                 }
 
                 try (BufferedWriter bw = new BufferedWriter(new FileWriter(petSelecionado))) {
-                    for(int i = 0; i < linhasOriginais.length; i++){
+                    for (int i = 0; i < linhasOriginais.length; i++) {
                         String conteudoLinha = linhasOriginais[i];
-                        if(i != 7){
+                        if (i != 7) {
                             conteudoLinha += " \n";
                         }
                         bw.write(conteudoLinha);
@@ -538,7 +566,7 @@ public class Menu {
         System.out.print("Deseja confirmar a exclusão do Pet? [SIM/NÃO]? ");
         String userInputConfirmacao = sc.nextLine();
 
-        if(userInputConfirmacao.toLowerCase().equals("sim") && petSelecionado.delete()){
+        if (userInputConfirmacao.toLowerCase().equals("sim") && petSelecionado.delete()) {
             System.out.println("Pet excluído com sucesso!");
         }
     }
