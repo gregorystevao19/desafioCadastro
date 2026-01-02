@@ -18,22 +18,22 @@ public class Menu {
     private File file = new File(directoryFormularioPerguntas, fileFormularioPerguntas);
 
     public void printMenu() {
-        System.out.println("----------------- SISTEMA DE PETS -----------------");
+        System.out.println("--------------------- SISTEMA DE PETS ---------------------");
         System.out.println("[1] - Cadastrar um novo pet");
         System.out.println("[2] - Alterar os dados do pet cadastrado");
         System.out.println("[3] - Deletar um pet cadastrado");
         System.out.println("[4] - Listar todos os pets cadastrados");
         System.out.println("[5] - Listar pets por algum critério (idade, nome, raça)");
         System.out.println("[6] - Sair");
-        System.out.println("---------------------------------------------------");
+        System.out.println("-----------------------------------------------------------");
     }
 
     public void handleMenuInput() {
 
-        System.out.print("Informe qual opção será executada: ");
-        userInput = sc.nextLine();
-
         while (true) {
+            System.out.print("Informe qual opção será executada: ");
+            userInput = sc.nextLine();
+
             int numericUserInput;
             try {
                 numericUserInput = Integer.parseInt(userInput.trim());
@@ -43,9 +43,12 @@ public class Menu {
                     case 2 -> atualizarDadosPet();
                     case 3 -> deletarPet();
                     case 5 -> listarPetsPorCriterio();
-                    case 6 -> System.out.println("Finalizando ...");
+                    case 6 -> {
+                        System.out.println("Finalizando programa...");
+                        return;
+                    }
                 }
-                return;
+                printMenu();
             } catch (NumberFormatException e) {
                 System.out.print("Valor inválido, informe novamente: ");
                 userInput = sc.nextLine();
