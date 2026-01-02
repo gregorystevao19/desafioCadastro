@@ -1,7 +1,6 @@
 package domain;
 
 import java.io.*;
-import java.sql.Array;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -11,11 +10,10 @@ public class Menu {
 
     Scanner sc = new Scanner(System.in);
     String now = LocalDateTime.now().toString().replaceAll("[-:.]", "");
-    private String userInput;
 
-    private String directoryFormularioPerguntas = "src/assets";
-    private String fileFormularioPerguntas = "formulario.txt";
-    private File file = new File(directoryFormularioPerguntas, fileFormularioPerguntas);
+    private final String directoryFormularioPerguntas = "src/assets";
+    private final String fileFormularioPerguntas = "formulario.txt";
+    private final File file = new File(directoryFormularioPerguntas, fileFormularioPerguntas);
 
     public void printMenu() {
         System.out.println("--------------------- SISTEMA DE PETS ---------------------");
@@ -32,7 +30,7 @@ public class Menu {
 
         while (true) {
             System.out.print("Informe qual opção será executada: ");
-            userInput = sc.nextLine();
+            String userInput = sc.nextLine();
 
             int numericUserInput;
             try {
@@ -42,6 +40,7 @@ public class Menu {
                     case 1 -> cadastrarPet();
                     case 2 -> atualizarDadosPet();
                     case 3 -> deletarPet();
+                    case 4 -> listarPets();
                     case 5 -> listarPetsPorCriterio();
                     case 6 -> {
                         System.out.println("Finalizando programa...");
@@ -62,7 +61,7 @@ public class Menu {
     public String lerNomePet(String NAO_INFORMADO) {
         String userInput = sc.nextLine();
 
-        if (userInput.trim().isEmpty() || userInput == null) {
+        if (userInput.trim().isEmpty()) {
             userInput = NAO_INFORMADO;
             return userInput;
         }
@@ -286,6 +285,30 @@ public class Menu {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void listarPets() {
+        File pasta = new File("src/Database");
+        File[] arquivos = pasta.listFiles();
+
+        int indexListagem = 1;
+        System.out.println("------------------------ RESULTADOS ------------------------");
+        for (File arquivo : arquivos) {
+            if (arquivo.isFile()) {
+                try (BufferedReader br = new BufferedReader(new FileReader(arquivo))) {
+                    String line;
+                    System.out.print(indexListagem + " - ");
+                    while ((line = br.readLine()) != null) {
+                        System.out.print(line + " - ");
+                    }
+                    System.out.println("\n");
+                    indexListagem++;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        System.out.println("------------------------------------------------------------");
     }
 
     private File[] listarPetsPorCriterio() {
@@ -580,7 +603,7 @@ public class Menu {
         System.out.print("Deseja confirmar a exclusão do Pet? [SIM/NÃO]? ");
         String userInputConfirmacao = sc.nextLine();
 
-        if (userInputConfirmacao.toLowerCase().equals("sim") && petSelecionado.delete()) {
+        if (userInputConfirmacao.equalsIgnoreCase("sim") && petSelecionado.delete()) {
             System.out.println("Pet excluído com sucesso!");
         }
     }
