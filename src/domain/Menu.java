@@ -15,7 +15,34 @@ public class Menu {
     private final String fileFormularioPerguntas = "formulario.txt";
     private final File file = new File(directoryFormularioPerguntas, fileFormularioPerguntas);
 
-    public void printMenu() {
+    public int startMenu() {
+        System.out.println("--------------------- SISTEMA DE PETS ---------------------");
+        System.out.println("[1] - Iniciar o sistema para cadastro de PETS");
+        System.out.println("[2] - Iniciar o sistema para alterar formulário");
+        System.out.println("-----------------------------------------------------------");
+
+        int numericInputOpcaoSistema;
+        System.out.print("OPÇÃO: ");
+
+        while (true) {
+            String userInputOpcaoSistema = sc.nextLine();
+            try {
+                numericInputOpcaoSistema = Integer.parseInt(userInputOpcaoSistema);
+                if (numericInputOpcaoSistema < 1 || numericInputOpcaoSistema > 2) {
+                    throw new IllegalArgumentException();
+                }
+                break;
+            } catch (NumberFormatException e) {
+                System.out.print("Número inválido. Digite novamente: ");
+            } catch (IllegalArgumentException e) {
+                System.out.print("Opção inválida. Selecione entre [1] ou [2]: ");
+            }
+        }
+
+        return numericInputOpcaoSistema;
+    }
+
+    private static void printMenuGerenciarPets() {
         System.out.println("--------------------- SISTEMA DE PETS ---------------------");
         System.out.println("[1] - Cadastrar um novo pet");
         System.out.println("[2] - Alterar os dados do pet cadastrado");
@@ -24,12 +51,12 @@ public class Menu {
         System.out.println("[5] - Listar pets por algum critério (idade, nome, raça)");
         System.out.println("[6] - Sair");
         System.out.println("-----------------------------------------------------------");
+        System.out.print("Informe qual opção será executada: ");
     }
 
-    public void handleMenuInput() {
-
+    public void sistemaGerenciarPets() {
+        printMenuGerenciarPets();
         while (true) {
-            System.out.print("Informe qual opção será executada: ");
             String userInput = sc.nextLine();
 
             int numericUserInput;
@@ -47,18 +74,16 @@ public class Menu {
                         return;
                     }
                 }
-                printMenu();
+                printMenuGerenciarPets();
             } catch (NumberFormatException e) {
-                System.out.print("Valor inválido, informe novamente: ");
-                userInput = sc.nextLine();
+                System.out.print("Número inválido. Digite novamente: ");
             } catch (IllegalArgumentException e) {
                 System.out.print("Opção inexistente, informe novamente: ");
-                userInput = sc.nextLine();
             }
         }
     }
 
-    public String lerNomePet(String NAO_INFORMADO) {
+    private String lerNomePet(String NAO_INFORMADO) {
         String userInput = sc.nextLine();
 
         if (userInput.trim().isEmpty()) {
@@ -73,7 +98,7 @@ public class Menu {
         return userInput;
     }
 
-    public TipoPet lerTipoPet() {
+    private TipoPet lerTipoPet() {
         System.out.println("[1] - GATO");
         System.out.println("[2] - CACHORRO");
         int userInput = sc.nextInt();
@@ -87,7 +112,7 @@ public class Menu {
         return userInput == 1 ? TipoPet.GATO : TipoPet.CACHORRO;
     }
 
-    public SexoPet lerSexoPet() {
+    private SexoPet lerSexoPet() {
 
         System.out.println("[1] - MACHO");
         System.out.println("[2] - FEMEA");
@@ -102,7 +127,7 @@ public class Menu {
         return userInput == 1 ? SexoPet.MACHO : SexoPet.FEMEA;
     }
 
-    public Endereco lerEnderecoPet(String NAO_INFORMADO) {
+    private Endereco lerEnderecoPet(String NAO_INFORMADO) {
         String cidade = "";
         String rua = "";
         String numeroCasa = "";
@@ -151,7 +176,7 @@ public class Menu {
         return new Endereco(cidade, rua, numeroCasa);
     }
 
-    public String lerIdadePet(String NAO_INFORMADO) {
+    private String lerIdadePet(String NAO_INFORMADO) {
         while (true) {
             String userInput = sc.nextLine();
 
@@ -174,7 +199,7 @@ public class Menu {
         }
     }
 
-    public String lerPesoPet(String NAO_INFORMADO) {
+    private String lerPesoPet(String NAO_INFORMADO) {
         while (true) {
             String userInput = sc.nextLine();
 
@@ -197,7 +222,7 @@ public class Menu {
         }
     }
 
-    public String lerRacaPet(String NAO_INFORMADO) {
+    private String lerRacaPet(String NAO_INFORMADO) {
         String userInput = sc.nextLine();
 
         if (userInput.trim().isEmpty()) {
@@ -334,7 +359,7 @@ public class Menu {
         System.out.println("[5] - Raça");
         System.out.println("[6] - Endereço");
         System.out.println("[7] - Data de cadastro");
-        System.out.println("[8] - Sair");
+        System.out.println("[8] - TERMINAR ESCOLHA DE FILTROS");
         System.out.println("---------------------------------------------------");
 
         while (true) {
@@ -460,12 +485,17 @@ public class Menu {
                     String line;
                     System.out.print(indexListagem + " - ");
                     while ((line = br.readLine()) != null) {
+                        boolean devePrintarNegrito = false;
                         for (String texto : parametrosEncontrados) {
                             if (texto != null && texto.equals(line)) {
-                                System.out.print(COMECO_NEGRITO + line + FIM_NEGRITO + " - ");
+                                devePrintarNegrito = true;
                             }
                         }
-                        System.out.print(line + " - ");
+                        if (devePrintarNegrito) {
+                            System.out.print(COMECO_NEGRITO + line + FIM_NEGRITO + " - ");
+                        } else {
+                            System.out.print(line + " - ");
+                        }
                     }
                     System.out.println("\n");
                     indexListagem++;
@@ -605,6 +635,275 @@ public class Menu {
 
         if (userInputConfirmacao.equalsIgnoreCase("sim") && petSelecionado.delete()) {
             System.out.println("Pet excluído com sucesso!");
+        }
+    }
+
+    private static void printMenuGerenciarFormulario() {
+        System.out.println("--------------------- SISTEMA DE FORMULÁRIOS ---------------------");
+        System.out.println("[1] - Cadastrar nova pergunta");
+        System.out.println("[2] - Alterar pergunta existente");
+        System.out.println("[3] - Deletar pergunta existente");
+        System.out.println("[4] - Sair");
+        System.out.println("-------------------------------------------------------------------");
+        System.out.print("Informe qual opção será executada: ");
+    }
+
+    public void sistemaGerenciarFormulario() {
+        while (true) {
+            printMenuGerenciarFormulario();
+            String userInput = sc.nextLine();
+            int numericUserInput;
+            try {
+                numericUserInput = Integer.parseInt(userInput.trim());
+                if (numericUserInput < 0 || numericUserInput > 4) throw new IllegalArgumentException();
+                switch (numericUserInput) {
+                    case 1 -> cadastarPergunta();
+                    case 2 -> editarPergunta();
+                    case 3 -> excluirPergunta();
+                    case 4 -> {
+                        System.out.println("Finalizando programa...");
+                        return;
+                    }
+                }
+                printMenuGerenciarPets();
+            } catch (NumberFormatException e) {
+                System.out.print("Número inválido. Digite novamente: ");
+            } catch (IllegalArgumentException e) {
+                System.out.print("Opção inexistente, informe novamente: ");
+            }
+        }
+    }
+
+    private void cadastarPergunta() {
+        String pergunta;
+        System.out.print("Informe a pergunta: ");
+        pergunta = sc.nextLine();
+
+        while (Pattern.compile(".*\\d.*").matcher(pergunta).find() || pergunta.trim().isEmpty()) {
+            System.out.print("Somente caracteres (A-Z) são aceitos. Informe a raça novamente: ");
+            pergunta = sc.nextLine();
+            break;
+        }
+
+        String novaLinha = pergunta;
+        int quantidadeLinhasAtualmente = 0;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            while (br.readLine() != null) {
+                quantidadeLinhasAtualmente++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String[] linhasNovoArquivo = new String[quantidadeLinhasAtualmente + 1];
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            int index = 0;
+            while ((line = br.readLine()) != null) {
+                linhasNovoArquivo[index] = line;
+                index++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        linhasNovoArquivo[linhasNovoArquivo.length - 1] = (linhasNovoArquivo.length) + " - " + novaLinha;
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+            for (int i = 0; i < linhasNovoArquivo.length; i++) {
+                String conteudoLinha = linhasNovoArquivo[i];
+                if (i != linhasNovoArquivo.length - 1) {
+                    conteudoLinha += " \n";
+                }
+                bw.write(conteudoLinha);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void editarPergunta() {
+        int quantidadeLinhasAtualmente = 0;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            while (br.readLine() != null) {
+                quantidadeLinhasAtualmente++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (quantidadeLinhasAtualmente <= 7) {
+            System.out.println("Não há perguntas customizadas que podem ser editadas.");
+            return;
+        }
+
+        System.out.println("Qual pergunta deseja editar? ");
+        int indexPerguntas = 0;
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (indexPerguntas > 6) {
+                    System.out.println(line);
+                }
+                indexPerguntas++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.print("OPÇÃO: ");
+        String userInputPergutaEditar;
+        int numericUserInputPerguntaParaEditar;
+
+        while (true) {
+            userInputPergutaEditar = sc.nextLine();
+            try {
+                numericUserInputPerguntaParaEditar = Integer.parseInt(userInputPergutaEditar.trim());
+                if (numericUserInputPerguntaParaEditar < 7 || numericUserInputPerguntaParaEditar > quantidadeLinhasAtualmente)
+                    throw new IllegalArgumentException();
+                break;
+            } catch (NumberFormatException e) {
+                System.out.print("Número inválido. Digite novamente: ");
+            } catch (IllegalArgumentException e) {
+                System.out.print("Opção inexistente, informe novamente: ");
+            }
+        }
+
+        System.out.print("Informe o novo valor da pergunta " + numericUserInputPerguntaParaEditar + ": ");
+        String novoTextoPergunta = sc.nextLine();
+
+        String[] linhasNovoArquivo = new String[quantidadeLinhasAtualmente];
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            int index = 0;
+            while ((line = br.readLine()) != null) {
+
+                if (index == numericUserInputPerguntaParaEditar - 1) {
+                    linhasNovoArquivo[index] = (index + 1) + " - " + novoTextoPergunta;
+                    index++;
+                    continue;
+                }
+                linhasNovoArquivo[index] = line;
+                index++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+            for (int i = 0; i < linhasNovoArquivo.length; i++) {
+                String conteudoLinha = linhasNovoArquivo[i];
+                if (i != linhasNovoArquivo.length - 1) {
+                    conteudoLinha += " \n";
+                }
+                bw.write(conteudoLinha);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void excluirPergunta() {
+        int quantidadeLinhasAtualmente = 0;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            while (br.readLine() != null) {
+                quantidadeLinhasAtualmente++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (quantidadeLinhasAtualmente <= 7) {
+            System.out.println("Não há perguntas customizadas que podem ser excluídas.");
+            return;
+        }
+
+        System.out.println("Qual pergunta deseja excluir? ");
+        int indexPerguntas = 0;
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (indexPerguntas > 6) {
+                    System.out.println(line);
+                }
+                indexPerguntas++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.print("OPÇÃO: ");
+
+
+        String userInputPergutaExcluir;
+        int numericUserInputPerguntaParaExcluir;
+
+        while (true) {
+            userInputPergutaExcluir = sc.nextLine();
+            try {
+                numericUserInputPerguntaParaExcluir = Integer.parseInt(userInputPergutaExcluir.trim());
+                if (numericUserInputPerguntaParaExcluir < 7 || numericUserInputPerguntaParaExcluir > quantidadeLinhasAtualmente)
+                    throw new IllegalArgumentException();
+                break;
+            } catch (NumberFormatException e) {
+                System.out.print("Número inválido. Digite novamente: ");
+            } catch (IllegalArgumentException e) {
+                System.out.print("Opção inexistente, informe novamente: ");
+            }
+        }
+
+        System.out.print("Deseja confirmar a exclusão da pergunta: " + numericUserInputPerguntaParaExcluir + "? [SIM/NÃO]: ");
+        String userInputConfirmacao = sc.nextLine();
+
+        if (userInputConfirmacao.equalsIgnoreCase("não") || userInputConfirmacao.equalsIgnoreCase("nao") || userInputConfirmacao.equalsIgnoreCase("n")) {
+            return;
+        }
+
+        String[] linhasNovoArquivo = new String[quantidadeLinhasAtualmente - 1];
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            int indexIteracao = 0;
+            int indexPergunta = 0;
+            boolean diminuirIndexDasPerguntasSeguintes = false;
+            while ((line = br.readLine()) != null) {
+                if (indexIteracao == numericUserInputPerguntaParaExcluir - 1) {
+                    diminuirIndexDasPerguntasSeguintes = true;
+                    indexIteracao++;
+                    continue;
+                }
+                if (diminuirIndexDasPerguntasSeguintes) {
+                    String conteudoPerguntaSemIndex = line.replaceAll("^\\s*\\d+\\s*-\\s*(.*)$", "$1");
+                    String perguntaComIndexAjustado = indexPergunta + 1 + " - " + conteudoPerguntaSemIndex;
+                    linhasNovoArquivo[indexPergunta] = perguntaComIndexAjustado;
+                    indexIteracao++;
+                    indexPergunta++;
+                    continue;
+                }
+                linhasNovoArquivo[indexPergunta] = line;
+                indexIteracao++;
+                indexPergunta++;
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+            for (int i = 0; i < linhasNovoArquivo.length; i++) {
+                String conteudoLinha = linhasNovoArquivo[i];
+                if (i != linhasNovoArquivo.length - 1) {
+                    conteudoLinha += " \n";
+                }
+                bw.write(conteudoLinha);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

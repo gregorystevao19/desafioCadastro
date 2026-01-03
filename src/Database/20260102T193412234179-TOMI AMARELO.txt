@@ -1,0 +1,7 @@
+NOME: Tomi amarelo
+TIPO: GATO
+SEXO: MACHO
+ENDEREÇO:minha rua, 316, minha cidade
+IDADE: 20
+PESO: 5
+RAÇA: amarelo ou laranja
