@@ -237,7 +237,7 @@ public class Menu {
         return userInput;
     }
 
-    public void salvarArquivoPet(Pet pet, String nomePet) {
+    public void salvarArquivoPet(Pet pet, String nomePet, String[] respostasCustomizadas) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter("src/Database/" + now + "-" + nomePet.trim().toUpperCase() + ".txt"))) {
 
             bw.write("NOME: " + pet.getNome() + "\n");
@@ -248,6 +248,12 @@ public class Menu {
             bw.write("PESO: " + pet.getPeso() + "\n");
             bw.write("RAÇA: " + pet.getRaca());
 
+            if(respostasCustomizadas != null){
+                for (String resposta : respostasCustomizadas){
+                    bw.write("\n[PERGUNTA CUSTOMIZADA]: " + resposta);
+                }
+            }
+
             System.out.println("Pet cadastrado com sucesso!");
         } catch (IOException e) {
             e.printStackTrace();
@@ -257,6 +263,20 @@ public class Menu {
     private void cadastrarPet() {
 
         final String NAO_INFORMADO = "NÃO INFORMADO";
+        int quantidadePerguntasCustomizadas = 0;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            int index = 0;
+            while (br.readLine() != null) {
+                if (index > 6) {
+                    quantidadePerguntasCustomizadas++;
+                    index++;
+                }
+                index++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         try (BufferedReader bf = new BufferedReader(new FileReader(file))) {
             String line;
@@ -271,6 +291,7 @@ public class Menu {
             String raca = "";
 
             while ((line = bf.readLine()) != null) {
+                if (indexPergunta > 7) break;
                 System.out.println(line);
                 switch (indexPergunta) {
                     case 1: {
@@ -304,8 +325,31 @@ public class Menu {
                 }
                 indexPergunta++;
             }
+
+            String[] respostasPerguntasCustomizadas = new String[quantidadePerguntasCustomizadas];
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                String linePerguntaCustomizada;
+                int index = 0;
+                while ((linePerguntaCustomizada = br.readLine()) != null) {
+                    if (index > 6) {
+                        System.out.println(linePerguntaCustomizada);
+                        String resposta = sc.nextLine();
+                        if (resposta.trim().isEmpty()) {
+                            respostasPerguntasCustomizadas[index - 7] = NAO_INFORMADO;
+                            index++;
+                            continue;
+                        }
+                        respostasPerguntasCustomizadas[index - 7] = resposta;
+                        index++;
+                    }
+                    index++;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             Pet pet = new Pet(nome, tipo, sexoPet, endereco, idade, peso, raca);
-            salvarArquivoPet(pet, nome);
+            salvarArquivoPet(pet, nome, respostasPerguntasCustomizadas);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -532,12 +576,51 @@ public class Menu {
             }
         }
 
-        System.out.println("Qual informação do Pet deseja editar? ");
+        int quantidadePerguntasCustomizadas = 0;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            int index = 0;
+            while (br.readLine() != null) {
+                if (index > 6) {
+                    quantidadePerguntasCustomizadas++;
+                    index++;
+                }
+                index++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String[] perguntasCustomizadas = new String[quantidadePerguntasCustomizadas];
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            int index = 0;
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (index > 6) {
+                    String conteudoPerguntaSemIndex = line.replaceAll("^\\s*\\d+\\s*-\\s*(.*)$", "$1");
+                    perguntasCustomizadas[index - 7] = "[" + (index - 1) + "]" + " - " + "[" + "ATRIBUTO DE PERGUNTA CUSTOMIZADA" + "] " + conteudoPerguntaSemIndex;
+                    index++;
+                    continue;
+                }
+                index++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
         System.out.println("[1] - Nome/Sobrenome");
         System.out.println("[2] - Endereço");
         System.out.println("[3] - Idade");
         System.out.println("[4] - Peso");
         System.out.println("[5] - Raça");
+
+        for(String pergunta: perguntasCustomizadas){
+            System.out.println(pergunta);
+        }
+
+        System.out.print("OPÇÃO: ");
 
         String userInputAtributoParaEditar = sc.nextLine();
 
@@ -545,7 +628,7 @@ public class Menu {
             try {
                 int numericUserInput = Integer.parseInt(userInputAtributoParaEditar);
 
-                if (numericUserInput < 1 || numericUserInput > 5) {
+                if (numericUserInput < 1 || numericUserInput > (5 + quantidadePerguntasCustomizadas)) {
                     throw new IllegalArgumentException();
                 }
 
@@ -555,10 +638,11 @@ public class Menu {
                     case 3 -> numericUserInput = 4;
                     case 4 -> numericUserInput = 5;
                     case 5 -> numericUserInput = 6;
+                    default -> numericUserInput += 1;
                 }
 
                 String novaLinha;
-                String[] linhasOriginais = new String[7];
+                String[] linhasOriginais = new String[(7 + quantidadePerguntasCustomizadas)];
 
                 try (BufferedReader br = new BufferedReader(new FileReader(petSelecionado))) {
                     String line;
@@ -587,7 +671,7 @@ public class Menu {
                 try (BufferedWriter bw = new BufferedWriter(new FileWriter(petSelecionado))) {
                     for (int i = 0; i < linhasOriginais.length; i++) {
                         String conteudoLinha = linhasOriginais[i];
-                        if (i != 7) {
+                        if (i != (7 + quantidadePerguntasCustomizadas)) {
                             conteudoLinha += " \n";
                         }
                         bw.write(conteudoLinha);
